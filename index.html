@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Amour & Complicité</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fff0f3; color: #4a4a4a; display: flex; justify-content: center; padding: 20px; }
+    .card { background: white; border-radius: 20px; padding: 25px; max-width: 500px; width: 100%; box-shadow: 0 10px 25px rgba(255, 77, 109, 0.15); border: 2px solid #ffccd5; text-align: center; }
+    h1 { color: #ff4d6d; font-size: 24px; margin-bottom: 10px; }
+    .btn { background: #ff4d6d; color: white; border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; font-size: 16px; }
+    .btn:hover { background: #c9184a; }
+    .option-btn { background: #fff; border: 2px solid #ffb3c1; color: #555; padding: 12px; margin: 8px 0; border-radius: 12px; width: 100%; text-align: left; font-size: 15px; cursor: pointer; transition: 0.2s; }
+    .option-btn:hover { background: #ffe6ea; border-color: #ff4d6d; }
+    .progress { height: 8px; background: #ffe6ea; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #ff4d6d; width: 0%; transition: width 0.3s; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div id="intro-screen">
+    <h1>💖 Quiz Amour & Complicité 💖</h1>
+    <p>Penses-tu vraiment me connaître par cœur ? Fais le test pour découvrir ta note !</p>
+    <button class="btn" onclick="startQuiz()">Commencer le Quiz</button>
+  </div>
+
+  <div id="quiz-screen" class="hidden">
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <h3 id="question-text">Question</h3>
+    <div id="options-container"></div>
+  </div>
+
+  <div id="result-screen" class="hidden">
+    <h1>Résultat du Quiz 🏆</h1>
+    <h2 id="score-text" style="color: #ff4d6d; font-size: 32px;"></h2>
+    <p id="feedback-text" style="font-size: 18px; font-weight: bold;"></p>
+    <button class="btn" onclick="location.reload()">Recommencer</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q: "Quelle est ma plus grande peur ?", correct: "La mort", options: ["Les araignées", "La mort", "Le vide", "L'échec"] },
+  { q: "Quelle est ma destination de rêve ?", correct: "Road trip en Asie", options: ["Road trip en Asie", "Safari en Afrique", "Road trip dans les fjords", "États-Unis"] },
+  { q: "Quel est mon plus grand défaut ?", correct: "Têtue", options: ["Perfectionniste", "Têtue", "Mauvaise cuisinière", "Trop speed"] },
+  { q: "Quel est mon film préféré ?", correct: "Interstellar", options: ["Interstellar", "Inception", "Nos étoiles contraires", "Titanic"] },
+  { q: "Quelle est ma plus grande qualité ?", correct: "Empathique", options: ["Organisée", "Patiente", "Empathique", "Bonne cuisinière"] },
+  { q: "Quelle est ma saison préférée ?", correct: "Le printemps", options: ["L'été", "L'automne", "L'hiver", "Le printemps"] },
+  { q: "Quel métier aurais-je aimé exercer ?", correct: "Actrice", options: ["Actrice", "Avocate", "Journaliste", "Ingénieure"] },
+  { q: "Qu'est-ce qui me fait le plus rire ?", correct: "Les blagues nulles", options: ["Les chiens humanisés", "Les blagues nulles", "Les chutes", "Les films comiques"] },
+  { q: "Dans quoi est-ce que je dépense le plus facilement ?", correct: "Les voyages", options: ["Les vêtements", "Les voyages", "L'esthétique", "Les jeux vidéo"] },
+  { q: "Quelle est la chose que je rêve de faire depuis longtemps ?", correct: "Faire de la montgolfière", options: ["Sauter en parachute", "Faire de la montgolfière", "Découvrir les aurores boréales", "Faire de la plongée"] }
+];
+
+let currentIndex = 0;
+let score = 0;
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function startQuiz() {
+  document.getElementById('intro-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[currentIndex];
+  document.getElementById('question-text').innerText = (currentIndex + 1) + ". " + q.q;
+  document.getElementById('progress-bar').style.width = ((currentIndex) / questions.length * 100) + "%";
+  
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  
+  const shuffledOptions = shuffle([...q.options]);
+  shuffledOptions.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerText = opt;
+    btn.onclick = () => selectOption(opt);
+    container.appendChild(btn);
+  });
+}
+
+function selectOption(selected) {
+  if (selected === questions[currentIndex].correct) {
+    score++;
+  }
+  currentIndex++;
+  if (currentIndex < questions.length) {
+    showQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  
+  document.getElementById('score-text').innerText = score + " / 10";
+  const feedback = document.getElementById('feedback-text');
+  
+  if (score === 10) {
+    feedback.innerText = "Un sans-faute parfait ! Tu me connais par cœur, je t'aime ! ❤️";
+  } else if (score >= 7) {
+    feedback.innerText = "Tu aurais pu faire mieux quand même ! 😜";
+  } else {
+    feedback.innerText = "Aïe aïe aïe... Il va falloir réviser, ma poule ! 😅";
+  }
+}
+</script>
+</body>
+</html>
